@@ -15,7 +15,7 @@ import { packageName, packageVersion } from "./lib/util.ts";
 
 /** Published versions of a package, or null if the package does not exist yet. */
 async function publishedVersions(name: string): Promise<Set<string> | null> {
-  const res = await fetch(`https://registry.npmjs.org/${name.replace("/", "%2F")}`, {
+  const res = await fetch(`https://registry.npmjs.org/${name.replaceAll("/", "%2F")}`, {
     headers: { accept: "application/json" },
   });
   if (res.status === 404) return null;
