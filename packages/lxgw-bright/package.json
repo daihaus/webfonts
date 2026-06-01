@@ -1,0 +1,38 @@
+{
+  "name": "@daihaus/lxgw-bright",
+  "version": "1.0.0",
+  "description": "LXGW Bright — a semi-serif Chinese webfont (LXGW WenKai Lite + Ysabeau). Subset to unicode-range woff2.",
+  "license": "OFL-1.1",
+  "homepage": "https://github.com/lxgw/LxgwBright",
+  "keywords": [
+    "font",
+    "webfont",
+    "woff2",
+    "css",
+    "cjk",
+    "chinese",
+    "subset",
+    "fontsource",
+    "lxgw-bright",
+    "lxgw",
+    "serif",
+    "kai"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daihaus/webfonts.git",
+    "directory": "packages/lxgw-bright"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "**/*.css",
+    "**/*.woff2",
+    "metadata.json",
+    "OFL.txt"
+  ]
+}

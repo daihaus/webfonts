@@ -1,0 +1,39 @@
+{
+  "name": "@daihaus/lxgw-bright-tc",
+  "version": "1.0.0",
+  "description": "LXGW Bright TC — the Traditional Chinese (TC) glyph cut of LXGW Bright. Subset to unicode-range woff2.",
+  "license": "OFL-1.1",
+  "homepage": "https://github.com/lxgw/LxgwBright",
+  "keywords": [
+    "font",
+    "webfont",
+    "woff2",
+    "css",
+    "cjk",
+    "chinese",
+    "subset",
+    "fontsource",
+    "lxgw-bright-tc",
+    "lxgw",
+    "serif",
+    "tc",
+    "traditional"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daihaus/webfonts.git",
+    "directory": "packages/lxgw-bright-tc"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "**/*.css",
+    "**/*.woff2",
+    "metadata.json",
+    "OFL.txt"
+  ]
+}
