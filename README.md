@@ -1,60 +1,68 @@
-# TypeScript Scaffold
+# Daihaus Webfonts
 
-A minimal bootstrap scaffold for TypeScript projects.
+Static webfont packages for OFL fonts that are useful before they are available
+from larger public CDNs such as Google Fonts or Fontsource. Packages are
+published to npm under the `@daihaus` scope and can be loaded through jsDelivr.
 
-This repository is intentionally small. It provides the shared project hygiene that most
-TypeScript repositories need before application code exists: package manager pinning, strict
-TypeScript defaults, formatting, linting, staged-file checks, and editor/devcontainer hints.
+The first published family is [LXGW Bright](https://github.com/lxgw/LxgwBright),
+split with [cn-font-split](https://github.com/KonghaYao/cn-font-split) so it can
+be loaded efficiently from jsDelivr.
 
-## What Is Included
+## LXGW Bright
 
-- PNPM workspace setup
-- Strict `tsconfig.json` defaults
-- Reusable ESLint flat config for TypeScript
-- Prettier formatting config
-- AutoCorrect text cleanup
-- Husky pre-commit and pre-push hooks
-- lint-staged checks that run local project binaries
-- Basic `.env.example`, `.gitignore`, VS Code, and devcontainer files
+Available families:
 
-## What Is Not Included
+- `LXGW Bright`
+- `LXGW Bright GB`
+- `LXGW Bright TC`
 
-- No app framework
-- No build tool
-- No test runner
-- No runtime entrypoint
-- No generated source tree
+Available CSS entries for each family:
 
-Add those only when a real project needs them.
+- `300.css`
+- `300-italic.css`
+- `400.css`
+- `400-italic.css`
+- `500.css`
+- `500-italic.css`
 
-## Commands
+Example:
 
-Install dependencies:
+```css
+@import url("https://cdn.jsdelivr.net/npm/@daihaus/lxgw-bright@0.1.0/fonts/lxgw-bright/400.css");
+
+body {
+  font-family: "LXGW Bright", serif;
+}
+```
+
+For production sites, pin a package version instead of relying on an unversioned
+URL.
+
+## Regeneration
+
+The build expects the upstream source checkout next to this repository:
 
 ```sh
 pnpm install
+pnpm run build:lxgw-bright
+pnpm run verify:fonts
 ```
 
-Format files:
+By default, the build reads:
+
+- `../gh.lxgw.lxgwbright`
+- `../gh.konghayao.cn-font-split`
+
+Override the source paths when needed:
 
 ```sh
-pnpm run format
+LXGW_BRIGHT_SOURCE=/path/to/LxgwBright \
+CN_FONT_SPLIT_SOURCE=/path/to/cn-font-split \
+pnpm run build:lxgw-bright
 ```
 
-Run lint checks:
+Source TTF files are not committed. This repository stores the generated CSS,
+WOFF2 shards, license files, and provenance metadata.
 
-```sh
-pnpm run lint
-```
-
-Run lint fixes and formatting:
-
-```sh
-pnpm run lint:fix
-```
-
-## Usage
-
-Start from this scaffold when you want a clean TypeScript repository foundation without
-choosing an application framework up front. Keep the base small, add project-specific tools
-deliberately, and prefer extending the existing config over replacing it.
+The generator uses the Rust CLI from `CN_FONT_SPLIT_SOURCE`, so Rust and Cargo
+must be available locally.

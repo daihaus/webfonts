@@ -1,14 +1,50 @@
 {
+  "name": "@daihaus/lxgw-bright",
+  "version": "0.1.0",
+  "description": "Webfont CSS and WOFF2 shards for LXGW Bright, LXGW Bright GB, and LXGW Bright TC.",
+  "license": "OFL-1.1",
+  "homepage": "https://github.com/daihaus/webfonts#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/daihaus/webfonts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/daihaus/webfonts/issues"
+  },
+  "keywords": [
+    "font",
+    "webfont",
+    "css",
+    "woff2",
+    "lxgw",
+    "lxgw-bright",
+    "chinese-font"
+  ],
+  "style": "fonts/lxgw-bright/400.css",
+  "exports": {
+    "./manifest.json": "./fonts/manifest.json",
+    "./lxgw-bright/*": "./fonts/lxgw-bright/*",
+    "./lxgw-bright-gb/*": "./fonts/lxgw-bright-gb/*",
+    "./lxgw-bright-tc/*": "./fonts/lxgw-bright-tc/*"
+  },
+  "files": [
+    "fonts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "packageManager": "pnpm@11.5.0+sha512.dbfcc4f81cf48597afd4bc391ffdf12c11f1a9fb83a395bfa6b0a2d9cc2fd8ffebafdb1ccbd529632153f793904c2615b7f09fe1a345473fd1c35845172a8eb1",
   "engines": {
     "node": ">=22.22.1"
   },
   "scripts": {
+    "build:lxgw-bright": "node scripts/build-lxgw-bright.mjs && prettier --write 'fonts/**/*.css'",
     "format": "prettier --write --ignore-unknown --log-level=warn . && autocorrect --fix .",
-    "lint": "eslint . --no-error-on-unmatched-pattern && pnpm run --filter '*' lint && prettier --check --ignore-unknown .",
+    "lint": "eslint . --no-error-on-unmatched-pattern && prettier --check --ignore-unknown .",
     "lint:staged": "lint-staged",
-    "lint:fix": "eslint . --no-error-on-unmatched-pattern --fix && pnpm run --filter '*' lint:fix && pnpm run format",
-    "prepare": "husky"
+    "lint:fix": "eslint . --no-error-on-unmatched-pattern --fix && pnpm run format",
+    "prepare": "node scripts/prepare-husky.mjs",
+    "verify:fonts": "node scripts/verify-fonts.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
