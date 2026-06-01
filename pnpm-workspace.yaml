@@ -1,5 +1,9 @@
 packages:
   - "packages/*"
+# cn-font-split is pinned to an exact, reviewed version and locked with a sha512 integrity hash in
+# pnpm-lock.yaml (npm versions are immutable), so this waives only pnpm's time-based release-age gate
+# for that one pinned dependency — we never follow `latest`, so a later compromised publish can't slip
+# in through a range. (pnpm added this entry automatically; 7.4.2 was published the same day.)
 minimumReleaseAgeExclude:
   - cn-font-split@7.4.2
 onlyBuiltDependencies:
