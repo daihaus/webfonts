@@ -87,19 +87,37 @@ Each package uses independent SemVer (starting `1.0.0`); the upstream font versi
 
 ## Adding or updating a font
 
-1. Make the source available — clone it locally (or set `sourceMode: 'release'` with a `releaseUrl`).
-2. Add/adjust an entry in [`fonts.config.ts`](fonts.config.ts) (slug = npm name + jsDelivr path, so
-   choose it once; `cssFamily`, license, upstream version, instances).
-3. Build, verify, publish:
-   ```sh
-   pnpm build:fonts        # regenerate packages/**   (or: --family <slug>, --clean)
-   pnpm verify:fonts       # url() resolves, valid woff2, no LFS pointers, package.json sane
-   pnpm release            # build + verify + pnpm -r publish --access public
-   ```
+1. Make the source reachable — set `upstream.releaseUrl` (a tagged tarball URL) and/or keep a local
+   clone at `upstream.localPath`. `sourceMode: "auto"` (default) uses the clone if present, else the
+   release tarball, so CI builds from a clean checkout.
+2. Add/adjust an entry in [`fonts.config.ts`](fonts.config.ts): `slug` (= npm name + jsDelivr path —
+   choose it once), `cssFamily`, `license`, `upstream`, `instances`, and an independent SemVer
+   `version`. Bump `version` whenever the font source or pipeline changes.
+3. Locally: `pnpm build:fonts` → `pnpm verify:fonts` (then `pnpm format`). Commit, PR, merge.
 4. Note the upstream↔package version mapping in [`CHANGELOG.md`](CHANGELOG.md).
 
-`@daihaus/*` is scoped, so publishing uses `--access public`. npm read-write tokens max out at 90 days
-(npm rule change, Dec 2025) — keep that in mind for CI.
+## Publishing
+
+Merging a `version` bump to `main` triggers
+[`.github/workflows/publish.yml`](.github/workflows/publish.yml), which publishes any package whose
+`version` isn't on npm yet (`scripts/ci-publish.ts` queries the registry; unchanged packages are
+skipped). `@daihaus/*` is scoped, so all publishes use `--access public`.
+
+- **New package** (not yet on npm) → first publish with the **`NPM_TOKEN`** secret — OIDC can't
+  bootstrap a package that doesn't exist yet.
+- **Existing package**, new version → **OIDC trusted publishing** (no token, automatic provenance).
+
+One-time setup:
+
+1. Create a **granular** npm token — scope **`@daihaus`**, **Read and write** to packages, ≤90-day
+   expiry (the Dec 2025 cap; set a rotation reminder). Add it as the repo secret **`NPM_TOKEN`**
+   (Settings → Secrets and variables → Actions). Required before the first publish.
+2. After a package's first (token) publish, add a **Trusted Publisher** in its npmjs.com settings →
+   repository `daihaus/webfonts`, workflow `publish.yml`. Subsequent bumps then publish via OIDC
+   without the token.
+
+Manual alternative (local): `npm login`, then `pnpm release` — builds with `--clean`, verifies, and
+runs `pnpm -r publish --access public`.
 
 ## Development
 

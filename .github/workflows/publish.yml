@@ -1,0 +1,63 @@
+name: Publish fonts
+
+# When fonts.config.ts (or the build) lands on main, publish any package whose version isn't on npm yet.
+# - brand-new package  -> first publish with NPM_TOKEN (OIDC can't bootstrap a package that doesn't exist)
+# - existing package   -> publish via OIDC trusted publishing (no token, automatic provenance)
+on:
+  push:
+    branches: [main]
+    paths:
+      - fonts.config.ts
+      - scripts/**
+      - .github/workflows/publish.yml
+  workflow_dispatch:
+
+concurrency:
+  group: publish-fonts
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write # OIDC trusted publishing + provenance attestations
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # Trusted publishing + provenance need npm >= 11.5.1.
+      - run: npm install -g npm@latest
+      - run: pnpm install --frozen-lockfile
+
+      - name: Plan — which packages need publishing
+        id: plan
+        run: pnpm exec tsx scripts/ci-publish.ts
+
+      - name: Build (sources auto-download from each upstream releaseUrl in CI)
+        if: steps.plan.outputs.hasWork == 'true'
+        run: |
+          pnpm exec tsx scripts/build-fonts.ts --clean
+          pnpm exec tsx scripts/verify-fonts.ts
+
+      - name: Publish new packages (token)
+        if: steps.plan.outputs.new != ''
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          printf '//registry.npmjs.org/:_authToken=%s\n' "$NODE_AUTH_TOKEN" > ~/.npmrc
+          for slug in ${{ steps.plan.outputs.new }}; do
+            ( cd "packages/$slug" && npm publish --provenance --access public )
+          done
+          rm -f ~/.npmrc
+
+      - name: Publish updates (OIDC trusted publishing)
+        if: steps.plan.outputs.update != ''
+        run: |
+          rm -f ~/.npmrc # no token in the environment → npm uses OIDC (and adds provenance automatically)
+          for slug in ${{ steps.plan.outputs.update }}; do
+            ( cd "packages/$slug" && npm publish --access public )
+          done
