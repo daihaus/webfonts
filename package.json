@@ -39,11 +39,15 @@
   },
   "scripts": {
     "build:lxgw-bright": "node scripts/build-lxgw-bright.mjs && prettier --write 'fonts/**/*.css'",
+    "check:npm-package": "node scripts/check-npm-package.mjs",
     "format": "prettier --write --ignore-unknown --log-level=warn . && autocorrect --fix .",
     "lint": "eslint . --no-error-on-unmatched-pattern && prettier --check --ignore-unknown .",
     "lint:staged": "lint-staged",
     "lint:fix": "eslint . --no-error-on-unmatched-pattern --fix && pnpm run format",
+    "prepack": "pnpm run verify:fonts",
+    "prepublishOnly": "pnpm run publish:check",
     "prepare": "node scripts/prepare-husky.mjs",
+    "publish:check": "pnpm run lint && pnpm run verify:fonts && pnpm run check:npm-package",
     "verify:fonts": "node scripts/verify-fonts.mjs"
   },
   "devDependencies": {
