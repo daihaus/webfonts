@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, rename, stat, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { repoRoot } from "./util.ts";
@@ -30,6 +30,12 @@ async function exists(p: string): Promise<boolean> {
   }
 }
 
+async function sha256File(p: string): Promise<string> {
+  return createHash("sha256")
+    .update(await readFile(p))
+    .digest("hex");
+}
+
 /**
  * Ensure the cn-font-split Rust core binary for the current platform is present in a repo-local
  * cache, downloading it from the pinned core release if needed. Returns the absolute binary path,
@@ -41,10 +47,25 @@ export async function ensureCoreBinary(
   checksums: Record<string, string> = {},
 ): Promise<string> {
   const target = rustTarget();
-  const name = `libffi-${target}.${binExt(target)}`;
+  const ext = binExt(target);
+  const name = `libffi-${target}.${ext}`;
   const dir = join(repoRoot, ".cache", "cn-font-split", coreVersion);
   const dest = join(dir, name);
-  if (await exists(dest)) return dest;
+  const expected = checksums[`${target}.${ext}`];
+
+  // If any checksums are pinned, this platform must be covered — otherwise we'd silently run an
+  // unverified native binary (e.g. the wasm/freebsd fallback target). Refuse rather than skip.
+  if (Object.keys(checksums).length > 0 && !expected) {
+    throw new Error(
+      `No pinned core checksum for ${name}; refusing to run an unverified binary (add it to generator.coreChecksums).`,
+    );
+  }
+
+  // A cache hit must still pass the integrity gate: re-hash the cached file (guards cache tampering
+  // and binaries cached before checksums were pinned). A mismatch is treated as a miss → re-download.
+  if (await exists(dest)) {
+    if (!expected || (await sha256File(dest)) === expected) return dest;
+  }
 
   await mkdir(dir, { recursive: true });
   const host = process.env.CN_FONT_SPLIT_GH_HOST ?? "https://github.com";
@@ -71,9 +92,8 @@ export async function ensureCoreBinary(
       `Downloaded core is implausibly small (${String(bytes.byteLength)} bytes): ${url.href}`,
     );
   }
-  // Integrity check: the core binary is dlopen'd into the build, so a tampered-but-plausible binary
-  // from a compromised release host must be caught. Verify against the pinned SHA-256 when present.
-  const expected = checksums[`${target}.${binExt(target)}`];
+  // Integrity check on the freshly downloaded bytes (expected is guaranteed set when any checksum is
+  // configured; the dlopen'd binary is the build's native trust boundary).
   if (expected) {
     const actual = createHash("sha256").update(bytes).digest("hex");
     if (actual !== expected) {
