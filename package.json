@@ -1,5 +1,6 @@
 {
   "packageManager": "pnpm@11.5.0+sha512.dbfcc4f81cf48597afd4bc391ffdf12c11f1a9fb83a395bfa6b0a2d9cc2fd8ffebafdb1ccbd529632153f793904c2615b7f09fe1a345473fd1c35845172a8eb1",
+  "private": true,
   "engines": {
     "node": ">=22.22.1"
   },
@@ -8,16 +9,24 @@
     "lint": "eslint . --no-error-on-unmatched-pattern && pnpm run --filter '*' lint && prettier --check --ignore-unknown .",
     "lint:staged": "lint-staged",
     "lint:fix": "eslint . --no-error-on-unmatched-pattern --fix && pnpm run --filter '*' lint:fix && pnpm run format",
-    "prepare": "husky"
+    "prepare": "husky",
+    "build:fonts": "tsx scripts/build-fonts.ts",
+    "verify:fonts": "tsx scripts/verify-fonts.ts",
+    "catalog": "tsx scripts/build-fonts.ts --catalog-only",
+    "release": "pnpm build:fonts && pnpm verify:fonts && pnpm -r publish --access public --no-git-checks"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/node": "^25.9.1",
     "autocorrect-node": "^2.14.0",
+    "cn-font-split": "7.4.2",
     "eslint": "^10.4.1",
     "globals": "^17.6.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.6",
     "prettier": "^3.8.3",
-    "typescript-eslint": "^8.60.0"
+    "tsx": "^4.22.4",
+    "typescript-eslint": "^8.60.0",
+    "zod": "^4.4.3"
   }
 }

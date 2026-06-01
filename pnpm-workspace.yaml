@@ -1,2 +1,6 @@
+packages:
+  - "packages/*"
+minimumReleaseAgeExclude:
+  - cn-font-split@7.4.2
 onlyBuiltDependencies:
   - esbuild

@@ -22,3 +22,7 @@ coverage
 
 # Local config files
 *.local.*
+
+# Generated webfont packages (CSS url() paths are verified; do not reformat) and caches
+packages
+.cache

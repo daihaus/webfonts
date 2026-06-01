@@ -1,0 +1,4 @@
+# Generated webfont packages — never rewrite (CSS url() paths and JSON are verified) and build caches
+packages/
+.cache/
+.preview/
