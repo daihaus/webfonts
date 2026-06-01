@@ -1,6 +1,7 @@
 import { readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
+import { verifySourceFile } from "./integrity.ts";
 import type { Family, Instance } from "./manifest.ts";
 
 interface FontSplitOptions {
@@ -46,6 +47,7 @@ export async function splitInstance(opts: {
   const { family, instance, sourceRoot, outDir } = opts;
   const buf = await readFile(join(sourceRoot, instance.file));
   const input = new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+  verifySourceFile(instance.file, input, family.upstream.sourceChecksums);
 
   const fontSplit = await loadFontSplit();
   await fontSplit({

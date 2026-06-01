@@ -22,6 +22,47 @@ const lxgwBrightUpstream = {
   localPath: "~/repos/gh.lxgw.lxgwbright",
   releaseUrl: "https://github.com/lxgw/LxgwBright/archive/refs/tags/v5.528.tar.gz",
   licensePath: "OFL.txt",
+  // SHA-256 of each consumed source file (content, not the non-byte-stable GitHub archive tarball).
+  // Anchors the republished output to the reviewed source bytes; regenerate when bumping the version.
+  sourceChecksums: {
+    "LXGWBright/LXGWBright-Light.ttf":
+      "445374bc4fca6c03354b91083150395ed4c920d2fa002478eccf11fbde93429e",
+    "LXGWBright/LXGWBright-LightItalic.ttf":
+      "24732449d7c522906b42a1b67a0207c59c226e3f54484c80655b526feb8a7824",
+    "LXGWBright/LXGWBright-Regular.ttf":
+      "d8cd796c0c73f82dcaf514f11d7408892890ce3bfea570c1754fb0bed33cd5a7",
+    "LXGWBright/LXGWBright-Italic.ttf":
+      "ce3db7e68c39a0f3016d71c8169b3e9cd26f7a635f86c8dac84dd0b9ac3a0229",
+    "LXGWBright/LXGWBright-Medium.ttf":
+      "91edbdde61f0148736decb6cf44e93707477999cacc92e1046ea7c462eec5167",
+    "LXGWBright/LXGWBright-MediumItalic.ttf":
+      "d17c90f6eaca283bcd9a5d5b67c1de62aed9f35844fd9a1d2cf676dd2bc7d18a",
+    "LXGWBrightGB/LXGWBrightGB-Light.ttf":
+      "c04a10c4615dccdb4cd6bd557ff40aa0fb2c8b43c2421b301bfa36aebfde8ba6",
+    "LXGWBrightGB/LXGWBrightGB-LightItalic.ttf":
+      "c2bfc4084d7f5730fb74aa0bb21b40f6c08c7ea76c7f1543efdfffd38202eab2",
+    "LXGWBrightGB/LXGWBrightGB-Regular.ttf":
+      "cd78eb7d99b2f8cbf2a1bed52ab998ff1e76e18048d9b925ce2799aa6310e72d",
+    "LXGWBrightGB/LXGWBrightGB-Italic.ttf":
+      "52c8326309e80ec25ba2f1015e670267411ddbc9870e9171109bf87827054508",
+    "LXGWBrightGB/LXGWBrightGB-Medium.ttf":
+      "6eddb687de7da2db97f905afb801d737821825eac543f381531c6fa71676b2c3",
+    "LXGWBrightGB/LXGWBrightGB-MediumItalic.ttf":
+      "906ac7ef4281e7816b7e0e6cfa3f1615484778df9cb067d7c04a8518902b2824",
+    "LXGWBrightTC/LXGWBrightTC-Light.ttf":
+      "8e9c577f7e8012a65f695a5c228dc116a16e1e2cdd5573d414fe3493c72df0a2",
+    "LXGWBrightTC/LXGWBrightTC-LightItalic.ttf":
+      "d34932f0b883ef9e433d152b23dd43466970c89518e45d27313490755727da8f",
+    "LXGWBrightTC/LXGWBrightTC-Regular.ttf":
+      "3eabaf8741a44609b19b819d1c420cf8bf0c20c6f44aceaaf60223bc9088a0ba",
+    "LXGWBrightTC/LXGWBrightTC-Italic.ttf":
+      "23a7007e4c2aa6edda08d8d95dce92741ea3e1d7946c526ec8059f04ca1230f8",
+    "LXGWBrightTC/LXGWBrightTC-Medium.ttf":
+      "6784f50d17a0c67efba40892cbf37c73e367930c685db39f47ea3850f726e0f8",
+    "LXGWBrightTC/LXGWBrightTC-MediumItalic.ttf":
+      "97b8d99603dd5150aac5e600b65278f410b5f7c02c333be8f3d6855b8ab1f72b",
+    "OFL.txt": "7727876c16ded8d2b2a9cba3c68e25ba7897662bd4a98d2d712015af13a149e1",
+  },
 } satisfies ManifestInput["families"][number]["upstream"];
 
 const config = {

@@ -46,6 +46,12 @@ export const FamilySchema = z.object({
     releaseUrl: z.string().optional(),
     /** License file path within the source root. */
     licensePath: z.string().default("OFL.txt"),
+    /**
+     * SHA-256 (hex) of each consumed source file (instances + license), keyed by source-relative
+     * path. Hashing file content (not the GitHub auto-archive tarball, which isn't byte-stable)
+     * anchors the republished output to the exact reviewed source bytes.
+     */
+    sourceChecksums: z.record(z.string(), z.string()).default({}),
   }),
   instances: z.array(InstanceSchema).min(1),
 });

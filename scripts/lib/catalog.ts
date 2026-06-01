@@ -1,6 +1,7 @@
-import { copyFile, readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
+import { verifySourceFile } from "./integrity.ts";
 import type { Family, Manifest } from "./manifest.ts";
 import { dirName, packageName, packageVersion, stylesOf, weightsOf } from "./util.ts";
 
@@ -16,10 +17,13 @@ export async function writeFamilyMeta(opts: {
 }): Promise<void> {
   const { family, familyDir, sourceRoot, manifest } = opts;
 
-  await copyFile(
-    join(sourceRoot, family.upstream.licensePath),
-    join(familyDir, family.license.file),
+  const licenseBytes = await readFile(join(sourceRoot, family.upstream.licensePath));
+  verifySourceFile(
+    family.upstream.licensePath,
+    new Uint8Array(licenseBytes.buffer, licenseBytes.byteOffset, licenseBytes.byteLength),
+    family.upstream.sourceChecksums,
   );
+  await writeFile(join(familyDir, family.license.file), licenseBytes);
 
   const metadata = {
     name: packageName(manifest, family),
