@@ -1,6 +1,6 @@
 {
   "name": "@daihaus/lxgw-bright-gb",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "LXGW Bright GB — the Mainland China (GB) glyph cut of LXGW Bright. Subset to unicode-range woff2.",
   "license": "OFL-1.1",
   "homepage": "https://github.com/lxgw/LxgwBright",

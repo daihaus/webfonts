@@ -22,7 +22,7 @@ never double-downloads a glyph.
 ## Use via jsDelivr (no install)
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@daihaus/lxgw-bright-gb@1.0.0/index.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@daihaus/lxgw-bright-gb@2.0.0/index.css" />
 <style>
   body {
     font-family: "LXGW Bright GB", serif;
@@ -33,8 +33,8 @@ never double-downloads a glyph.
 Narrower is smaller:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@daihaus/lxgw-bright-gb@1.0.0/weight-400.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@daihaus/lxgw-bright-gb@1.0.0/400-normal.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@daihaus/lxgw-bright-gb@2.0.0/weight-400.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@daihaus/lxgw-bright-gb@2.0.0/400-normal.css" />
 ```
 
 ## Use via npm (bundlers)
@@ -57,7 +57,7 @@ Pin an exact version; the CSS already contains the `@font-face` rules.
 Build the tarball (`npm pack` in this folder, or `pnpm pack:fonts` from the monorepo root), then:
 
 ```sh
-npm install ./daihaus-lxgw-bright-gb-1.0.0.tgz
+npm install ./daihaus-lxgw-bright-gb-2.0.0.tgz
 ```
 
 Or point a dependency straight at the built package folder:

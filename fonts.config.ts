@@ -93,7 +93,7 @@ const config = {
   families: [
     {
       slug: "lxgw-bright",
-      version: "1.0.0",
+      version: "2.0.0",
       displayName: "LXGW Bright",
       cssFamily: "LXGW Bright",
       description:
@@ -105,7 +105,7 @@ const config = {
     },
     {
       slug: "lxgw-bright-gb",
-      version: "1.0.0",
+      version: "2.0.0",
       displayName: "LXGW Bright GB",
       cssFamily: "LXGW Bright GB",
       description:
@@ -117,7 +117,7 @@ const config = {
     },
     {
       slug: "lxgw-bright-tc",
-      version: "1.0.0",
+      version: "2.0.0",
       displayName: "LXGW Bright TC",
       cssFamily: "LXGW Bright TC",
       description:
