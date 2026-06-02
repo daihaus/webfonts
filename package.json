@@ -13,6 +13,7 @@
     "build:fonts": "tsx scripts/build-fonts.ts",
     "verify:fonts": "tsx scripts/verify-fonts.ts",
     "catalog": "tsx scripts/build-fonts.ts --catalog-only",
+    "pack:fonts": "pnpm build:fonts -- --clean && pnpm verify:fonts && tsx scripts/pack-fonts.ts",
     "release": "pnpm build:fonts -- --clean && pnpm verify:fonts && pnpm -r publish --access public --no-git-checks"
   },
   "devDependencies": {

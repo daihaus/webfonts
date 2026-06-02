@@ -29,6 +29,10 @@
   "sideEffects": [
     "**/*.css"
   ],
+  "exports": {
+    ".": "./index.css",
+    "./*": "./*"
+  },
   "files": [
     "**/*.css",
     "**/*.woff2",

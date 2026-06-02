@@ -44,6 +44,12 @@ export async function writePackageManifest(opts: {
     publishConfig: { access: "public" },
     // CSS has side effects (it registers @font-face); keep bundlers from tree-shaking it away.
     sideEffects: ["**/*.css"],
+    // Default import (".") is the full bundle; "./*" keeps every CSS entry point importable and every
+    // url()→woff2 reference resolvable even under strict `exports` enforcement.
+    exports: {
+      ".": "./index.css",
+      "./*": "./*",
+    },
     // Allowlist the served assets so they ship even though woff2 is gitignored.
     files: ["**/*.css", "**/*.woff2", "metadata.json", family.license.file],
   };
@@ -62,7 +68,11 @@ export async function writePackageReadme(opts: {
   const cdn = `https://cdn.jsdelivr.net/npm/${name}@${version}`;
   const weights = weightsOf(family);
   const styles = stylesOf(family);
-  const sample = `${String(weights[1] ?? weights[0])}-${styles[0]}`;
+  const w = String(weights[1] ?? weights[0]); // sample weight
+  const s = styles[0]; // sample style
+  const cut = `${w}-${s}`; // sample atomic cut
+  // npm pack flattens scoped names: @daihaus/lxgw-bright → daihaus-lxgw-bright-<version>.tgz
+  const tarball = `${manifest.npm.scope.slice(1)}-${family.slug}-${version}.tgz`;
 
   const readme = `# ${name}
 
@@ -72,9 +82,20 @@ ${description(family)}
 - **weights:** ${weights.join(", ")} · **styles:** ${styles.join(", ")}
 - **license:** ${family.license.id} — generated from [${family.upstream.repo}@${family.upstream.version}](${family.upstream.homepage}) with ${manifest.generator.tool}
 
-## Use via jsDelivr (no install)
+## CSS entry points
 
-Whole family, one tag-pinned link (every weight/style, lazy-loaded per \`unicode-range\`):
+Every file lazy-loads only the glyph chunks a page actually uses (per \`unicode-range\`). Import the
+narrowest one that covers the weights/styles you use — \`.woff2\` bytes are shared, so mixing files
+never double-downloads a glyph.
+
+| File | Contains |
+| --- | --- |
+| \`index.css\` | all weights × all styles |
+| \`weight-<weight>.css\` | one weight, all styles — e.g. \`weight-${w}.css\` |
+| \`style-<style>.css\` | one style, all weights — e.g. \`style-${s}.css\` |
+| \`<weight>-<style>.css\` | exactly one cut — e.g. \`${cut}.css\` |
+
+## Use via jsDelivr (no install)
 
 \`\`\`html
 <link rel="stylesheet" href="${cdn}/index.css" />
@@ -85,10 +106,11 @@ Whole family, one tag-pinned link (every weight/style, lazy-loaded per \`unicode
 </style>
 \`\`\`
 
-A single weight/style is smaller still:
+Narrower is smaller:
 
 \`\`\`html
-<link rel="stylesheet" href="${cdn}/${sample}/result.css" />
+<link rel="stylesheet" href="${cdn}/weight-${w}.css" />
+<link rel="stylesheet" href="${cdn}/${cut}.css" />
 \`\`\`
 
 ## Use via npm (bundlers)
@@ -98,10 +120,28 @@ npm install ${name}
 \`\`\`
 
 \`\`\`js
-import "${name}/index.css"; // or "${name}/${sample}/result.css"
+import "${name}";                // full bundle (index.css)
+import "${name}/weight-${w}.css"; // one weight, all styles
+import "${name}/style-${s}.css";   // one style, all weights
+import "${name}/${cut}.css";      // exactly one cut
 \`\`\`
 
 Pin an exact version; the CSS already contains the \`@font-face\` rules.
+
+## Install locally (without publishing)
+
+Build the tarball (\`npm pack\` in this folder, or \`pnpm pack:fonts\` from the monorepo root), then:
+
+\`\`\`sh
+npm install ./${tarball}
+\`\`\`
+
+Or point a dependency straight at the built package folder:
+
+\`\`\`jsonc
+// package.json
+{ "dependencies": { "${name}": "file:../path/to/packages/${family.slug}" } }
+\`\`\`
 `;
   await writeFile(join(familyDir, "README.md"), readme, "utf8");
 }

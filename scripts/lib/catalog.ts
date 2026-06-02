@@ -34,11 +34,20 @@ export async function writeFamilyMeta(opts: {
     fontDisplay: family.fontDisplay,
     weights: weightsOf(family),
     styles: stylesOf(family),
+    // CSS entry points, narrowest → broadest. Every file lazy-loads its chunks per unicode-range.
+    css: {
+      full: "index.css",
+      weights: Object.fromEntries(
+        weightsOf(family).map((w) => [String(w), `weight-${String(w)}.css`]),
+      ),
+      styles: Object.fromEntries(stylesOf(family).map((s) => [s, `style-${s}.css`])),
+    },
     instances: family.instances.map((i) => ({
       weight: i.weight,
       style: i.style,
+      // `dir` is the woff2 chunk folder; `css` is the root-level atomic entry point for this cut.
       dir: dirName(i),
-      css: `${dirName(i)}/result.css`,
+      css: `${dirName(i)}.css`,
     })),
     license: {
       id: family.license.id,

@@ -27,8 +27,16 @@ _Served from npm via jsDelivr: `https://cdn.jsdelivr.net/npm/@daihaus/<name>@<ve
 
 ## Usage
 
-Pick a package from the table above. Each `index.css` bundles every weight & style of that font (all
-lazy-loaded per `unicode-range`).
+Pick a package from the table above. Each package ships a **grid of CSS entry points** so you only
+load what you use — every file is still lazy per `unicode-range`, and `.woff2` bytes are shared across
+files (mixing entry points never double-downloads a glyph):
+
+| File                   | Contains                                         |
+| ---------------------- | ------------------------------------------------ |
+| `index.css`            | all weights × all styles                         |
+| `weight-<weight>.css`  | one weight, all styles (e.g. `weight-400.css`)   |
+| `style-<style>.css`    | one style, all weights (e.g. `style-italic.css`) |
+| `<weight>-<style>.css` | exactly one cut (e.g. `400-italic.css`)          |
 
 **Via jsDelivr (no install):**
 
@@ -44,6 +52,8 @@ lazy-loaded per `unicode-range`).
 </style>
 ```
 
+Swap `index.css` for any narrower entry point, e.g. `.../weight-400.css` or `.../400-italic.css`.
+
 **Via npm (bundlers):**
 
 ```sh
@@ -51,10 +61,30 @@ npm install @daihaus/lxgw-bright
 ```
 
 ```js
-import "@daihaus/lxgw-bright/index.css"; // or "@daihaus/lxgw-bright/400-normal/result.css"
+import "@daihaus/lxgw-bright"; // full bundle (index.css)
+import "@daihaus/lxgw-bright/weight-400.css"; // one weight, all styles
+import "@daihaus/lxgw-bright/style-italic.css"; // one style, all weights
+import "@daihaus/lxgw-bright/400-italic.css"; // exactly one cut
 ```
 
 Pin an exact version. The CSS already contains the `@font-face` rules; you never hand-write them.
+
+### Install locally (without publishing)
+
+Build the packages, then pack them into gitignored `artifacts/*.tgz`:
+
+```sh
+pnpm pack:fonts        # build:fonts --clean + verify:fonts + npm pack each package
+npm install ./artifacts/daihaus-lxgw-bright-1.0.0.tgz
+```
+
+Or point a dependency straight at a built package folder (run `pnpm build:fonts` first so the
+generated css/woff2 exist):
+
+```jsonc
+// package.json
+{ "dependencies": { "@daihaus/lxgw-bright": "file:../webfonts/packages/lxgw-bright" } }
+```
 
 ## Why npm instead of committing fonts to this repo
 
@@ -71,15 +101,20 @@ gitignored and ships only inside the published package (via each `package.json` 
 
 ```
 packages/<font>/                 = one npm package, @daihaus/<font>
-├── package.json                 name, version, files allowlist (generated)
+├── package.json                 name, version, exports, files allowlist (generated)
 ├── README.md                    per-package usage (generated)
 ├── OFL.txt                      license
-├── metadata.json                provenance
-├── index.css                    whole font: every weight/style inlined
+├── metadata.json                provenance + css entry-point map
+├── index.css                    full bundle: every weight × style inlined
+├── weight-<weight>.css          one weight, all styles      (e.g. weight-400.css)
+├── style-<style>.css            one style, all weights       (e.g. style-italic.css)
+├── <weight>-<style>.css         one cut, @font-face → ./<weight>-<style>/<hash>.woff2
 └── <weight>-<style>/            e.g. 400-normal, 500-italic
-    ├── result.css               @font-face → ./<hash>.woff2
-    └── <hash>.woff2 (×N)        gitignored; shipped in the npm package
+    └── <hash>.woff2 (×N)        gitignored; shipped in the npm package; shared by every css above
 ```
+
+Every CSS entry point references the same content-hashed `.woff2` chunks (no byte duplication — only
+the small `@font-face` text repeats per file).
 
 Each package uses independent SemVer (starting `1.0.0`); the upstream font version is recorded in
 `metadata.json`, the package README, and the [CHANGELOG](CHANGELOG.md). Bump the package `version` in

@@ -2,7 +2,7 @@ import { mkdir, rm } from "node:fs/promises";
 import { join } from "node:path";
 
 import config from "../fonts.config.ts";
-import { writeFamilyIndex } from "./lib/aggregate.ts";
+import { writeFamilyStyles } from "./lib/aggregate.ts";
 import { updateReadmeCatalog, writeFamilyMeta } from "./lib/catalog.ts";
 import { ensureCoreBinary } from "./lib/core.ts";
 import { parseManifest } from "./lib/manifest.ts";
@@ -86,7 +86,7 @@ async function main(): Promise<void> {
     }
 
     await writeFamilyMeta({ family, familyDir, sourceRoot, manifest });
-    await writeFamilyIndex({
+    await writeFamilyStyles({
       family,
       familyDir,
       generator: `${manifest.generator.tool}@${manifest.generator.version} (core ${manifest.generator.core})`,
