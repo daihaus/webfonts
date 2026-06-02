@@ -76,19 +76,26 @@ async function main(): Promise<void> {
         errors.push(`${family.slug}/package.json: files[] does not include woff2`);
     }
 
-    // Every CSS entry point — atomic cuts + per-weight/per-style bundles + the full index — must exist
-    // and have all its url() chunk refs resolve relative to the family dir.
-    const cssFiles = [
-      ...family.instances.map((i) => `${dirName(i)}.css`),
-      ...weightsOf(family).map((w) => `weight-${String(w)}.css`),
-      ...stylesOf(family).map((s) => `style-${s}.css`),
-      "index.css",
+    // Every CSS entry point — atomic cuts + per-weight/per-style bundles + the full index — paired
+    // with the exact set of cut sub-dirs (`<weight>-<style>`) it must inline. Each cut's chunks live
+    // under `./<dir>/`, so the dirs seen in a file's url() refs reveal precisely which cuts it carries.
+    const cssFiles: { file: string; cuts: string[] }[] = [
+      ...family.instances.map((i) => ({ file: `${dirName(i)}.css`, cuts: [dirName(i)] })),
+      ...weightsOf(family).map((w) => ({
+        file: `weight-${String(w)}.css`,
+        cuts: family.instances.filter((i) => i.weight === w).map((i) => dirName(i)),
+      })),
+      ...stylesOf(family).map((s) => ({
+        file: `style-${s}.css`,
+        cuts: family.instances.filter((i) => i.style === s).map((i) => dirName(i)),
+      })),
+      { file: "index.css", cuts: family.instances.map((i) => dirName(i)) },
     ];
 
     // Validate each referenced woff2 once (LFS pointer / wOF2 magic), no matter how many files cite it.
     const checked = new Set<string>();
 
-    for (const file of cssFiles) {
+    for (const { file, cuts } of cssFiles) {
       const cssPath = join(familyDir, file);
       if (!(await fileExists(cssPath))) {
         errors.push(`missing ${family.slug}/${file}`);
@@ -97,6 +104,17 @@ async function main(): Promise<void> {
       const css = await readFile(cssPath, "utf8");
       const refs = chunkRefs(css);
       if (!refs.length) errors.push(`${family.slug}/${file}: references no woff2 chunks`);
+
+      // Coverage: the cut sub-dirs this file actually inlines must equal the set it should carry.
+      // A too-narrow/too-broad subset filter in writeFamilyStyles would otherwise ship a silently
+      // wrong bundle (e.g. weight-400.css missing its italic cut) that still passes the ref checks.
+      const seenCuts = new Set(refs.map((r) => r.split("/")[0]));
+      const wantCuts = new Set(cuts);
+      for (const c of wantCuts)
+        if (!seenCuts.has(c)) errors.push(`${family.slug}/${file}: missing cut ${c}`);
+      for (const c of seenCuts)
+        if (!wantCuts.has(c)) errors.push(`${family.slug}/${file}: unexpected cut ${c}`);
+
       for (const ref of refs) {
         const chunkPath = join(familyDir, ref);
         if (!(await fileExists(chunkPath))) {
