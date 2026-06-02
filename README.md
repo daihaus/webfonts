@@ -43,7 +43,7 @@ files (mixing entry points never double-downloads a glyph):
 ```html
 <link
   rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/@daihaus/lxgw-bright@1.0.0/index.css"
+  href="https://cdn.jsdelivr.net/npm/@daihaus/lxgw-bright@2.0.0/index.css"
 />
 <style>
   body {
@@ -75,7 +75,7 @@ Build the packages, then pack them into gitignored `artifacts/*.tgz`:
 
 ```sh
 pnpm pack:fonts        # build:fonts --clean + verify:fonts + npm pack each package
-npm install ./artifacts/daihaus-lxgw-bright-1.0.0.tgz
+npm install ./artifacts/daihaus-lxgw-bright-2.0.0.tgz
 ```
 
 Or point a dependency straight at a built package folder (run `pnpm build:fonts` first so the
